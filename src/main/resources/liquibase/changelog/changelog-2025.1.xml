@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+>
+  <changeSet id="1717157360" author="me">
+    <createTable tableName="tasks">
+      <column name="id" type="bigint">
+        <constraints primaryKey="true" />
+      </column>
+      <column name="system_id" type="uuid">
+        <constraints nullable="false" unique="true"/>
+      </column>
+      <column name="title" type="varchar(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="description" type="varchar(255)"/>
+      <column name="status" type="varchar(10)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="due_date" type="date">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <createSequence sequenceName="tasks_id_seq"/>
+
+    <createIndex indexName="ix_tasks_system_id" tableName="tasks">
+      <column name="system_id" />
+    </createIndex>
+  </changeSet>
+
+</databaseChangeLog>

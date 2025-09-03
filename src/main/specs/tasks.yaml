@@ -1,0 +1,208 @@
+openapi: 3.0.1
+info:
+  title: Task API
+  description: API for managing Tasks
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000/api
+paths:
+  /tasks:
+    post:
+      tags:
+        - Task
+      summary: Create a Task
+      operationId: CreateTask
+      requestBody:
+        $ref: "#/components/requestBodies/CreateTaskRequest"
+      responses:
+        201:
+          $ref: "#/components/responses/201"
+        default:
+          $ref: "#/components/responses/default"
+    get:
+      tags:
+        - Task
+      summary: List all Tasks
+      operationId: ListTasks
+      responses:
+        200:
+          $ref: "#/components/responses/GetTasksResponse"
+        default:
+          $ref: "#/components/responses/default"
+  /tasks/{id}:
+    get:
+      tags:
+        - Task
+      summary: Retrieve a Task
+      operationId: GetTask
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        200:
+          $ref: "#/components/responses/GetTaskResponse"
+        404:
+          description: Not Found
+        default:
+          $ref: "#/components/responses/default"
+    put:
+      tags:
+        - Task
+      summary: Update a Task
+      operationId: UpdateTask
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        $ref: "#/components/requestBodies/PutTaskRequest"
+      responses:
+        200:
+          $ref: "#/components/responses/PutTaskResponse"
+        404:
+          description: Not Found
+        default:
+          $ref: "#/components/responses/default"
+    delete:
+      tags:
+        - Task
+      summary: Delete a Task
+      operationId: DeleteTask
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        204:
+          description: Deleted
+        404:
+          description: Not Found
+        default:
+          $ref: "#/components/responses/default"
+components:
+  requestBodies:
+    CreateTaskRequest:
+      description: Request for creation of a new Task
+      content:
+        application/json:
+          schema:
+            title: CreateTask200Request
+            $ref: "#/components/schemas/Task"
+    PutTaskRequest:
+      description: Request for update of a Task
+      content:
+        application/json:
+          schema:
+            title: PutTask200Request
+            $ref: "#/components/schemas/Task"
+  responses:
+    201:
+      description: Successful creation of a Task
+    default:
+      description: an error has occurred
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    GetTaskResponse:
+      description: Successful retrieval of a Task
+      content:
+        application/json:
+          schema:
+            title: GetTask200Response
+            $ref: "#/components/schemas/CreatedTask"
+    PutTaskResponse:
+      description: Successful update of a Task
+      content:
+        application/json:
+          schema:
+            title: PutTask200Response
+            $ref: "#/components/schemas/CreatedTask"
+    GetTasksResponse:
+      description: Successful retrieval of all Tasks
+      content:
+        application/json:
+          schema:
+            title: GetTasks200Response
+            $ref: "#/components/schemas/CreatedTasks"
+  parameters:
+    Id:
+      in: path
+      name: id
+      required: true
+      description: The Id of a Task
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    Error:
+      type: object
+      description: Standard error model
+      properties:
+        status:
+          type: integer
+          format: int32
+          description: HTTP Status of the error
+          example: 404
+        code:
+          type: string
+          description: The code of the error
+        message:
+          type: string
+          description: A detailed error message
+          example: Resource not found
+      required:
+        - status
+        - code
+        - message
+    Id:
+      type: object
+      properties:
+        systemId:
+          type: string
+          format: uuid
+          description: a unique id
+          example: e2428ea7-720d-4a14-a741-26b4aa92c139
+      required:
+        - systemId
+    CreatedTask:
+      description: a Task assigned to a Caseworker which exists within the system
+      allOf:
+        - $ref: "#/components/schemas/Id"
+        - $ref: "#/components/schemas/Task"
+      required:
+        - systemId
+        - title
+        - dueDate
+        - status
+    CreatedTasks:
+      description: A List of Tasks
+      type: array
+      items:
+        $ref: "#/components/schemas/CreatedTask"
+    Task:
+      type: object
+      description: a Task assigned to a Caseworker
+      required:
+        - dueDate
+        - status
+        - title
+      properties:
+        dueDate:
+          type: string
+          format: date-time
+          description: The date and time that the Task is Due
+          example: 2024-05-01T00:00:00Z
+        title:
+          description: The title of the Task to be performed
+          type: string
+          example: File Report
+          maxLength: 100
+        description:
+          description: The detailed description of the task
+          type: string
+          example: An action against person xyz has been taken
+          maxLength: 255
+        status:
+          description: The current status of the Task
+          type: string
+          enum:
+            - Open
+            - Closed
+          example:
+            Open
